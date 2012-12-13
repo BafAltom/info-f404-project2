@@ -9,7 +9,6 @@ int main(int argc, char *argv[]) {
 	
 	MPI_Init(&argc, &argv);
 	
-	cout<<"kikou je suis cleudo le clodo"<<endl;
 	
 	int myRank;	
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
@@ -24,7 +23,6 @@ int main(int argc, char *argv[]) {
 	}
     MPI_Bcast(&numberPlayer, 1, MPI_INT, 0, MPI_COMM_WORLD );
     
-    //MPI_Barrier(MPI_COMM_WORLD);
     
     int typeOfIA=-1;
     if(myRank ==0)
@@ -33,7 +31,6 @@ int main(int argc, char *argv[]) {
 		cin>>typeOfIA;
 	}
     MPI_Bcast(&typeOfIA, 1, MPI_INT, 0, MPI_COMM_WORLD );
-    MPI_Barrier(MPI_COMM_WORLD);
     
     if(myRank == 0)
     {
@@ -52,7 +49,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	
-	MPI_Barrier(MPI_COMM_WORLD);
 	MPI_Finalize();
     
     return 0;
