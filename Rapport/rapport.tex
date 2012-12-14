@@ -109,49 +109,10 @@ breaklines=true
 				\end{itemize}
 		\end{itemize}
 	
-				
+		(\hyperlink{GameMasterImplementation}{Voir l'implémentation de GameMaster en annexe} )		
 		
 		
-		\fontfamily{pcr}
-		\begin{lstlisting}
-while(_isGameNotFinished)
-{
-	if(_isHumanTurn)
-	{
-		// On demande a l'utilisateur s'il veut faire une suggestion ou 
-		// une accusation
-		// Puis on la recupere dans un array : int suggestion[3]
-		if(suggestionType == 1) {
-			HumanMakeSuggestion(suggestion);
-		}
-		else {
-			HumanMakeAccusation(suggestion);
-		}
-		_isHumanTurn = false;
-		int messageType[2] = { -3, 0 };
-		MPI_Send(&messageType, 2, MPI_INT, 1, 0, MPI_COMM_WORLD);
-	} 
-	else {
-		int typeMessage[2];
-		MPI_Recv(&typeMessage, 2, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		if(typeMessage[0] == -1){
-			int reply = disaproveASuggestion();
-			MPI_Send(&reply, 1, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD);
-		}
-		else if(typeMessage[0] == -2){
-			MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);		
-		}
-		else if(typeMessage[0] == -3){
-			_isHumanTurn = true;
-		}
-		else if(typeMessage[0] == -5){
-			int accusation[3];
-			MPI_Recv(&accusation, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			MJcheckAccusation(accusation, typeMessage[1]);
-}	}	}
-\end{lstlisting}
-\fontfamily{}	
-	
+
 	
 	\subsection{Implémentation de AI}
 	L'IA a un fonctionnement assez semblable à celui du gameMaster.\\
@@ -183,9 +144,26 @@ while(_isGameNotFinished)
 	
 	\subsection{Communications entre processus}
 		En permanence on a un processus actifs tandis que les autres processus attendent un message.\\
-		Ce message est un array d'entier de taille deux, de la forme : message[2] = {"type du message", "rang de l'envoyeur"}\\
-		Lorsqu'il reçoit ce message un processus en attente utilise l'entier représentant le "type du message" pour savoir comment réagir et dans qu'elles méthodes aller.\\
-		Les différents processus alternent alors les sends et les receives, en fonction de ce qui leur est demandé.
+		Ce message est un array d'entier de taille deux, de la forme : message[2] = \{"type du message", "rang de l'envoyeur"\}\\
+		Lorsqu'il reçoit ce message un processus en attente utilise l'entier représentant le "type du message" pour savoir comment réagir et dans qu'elles méthodes aller puis le "rang de l'envoyeur" pour savoir à qui répondre.\\
+		Les différents processus alternent alors les sends et les receives, en fonction de ce qui leur est demandé :
+		\begin{itemize}
+			\item Envoi d'une suggestion (ou d'une accusation) à tous les joueurs.\\
+					Le joueur actif envoi alors l'array typeMessage[2] = \{ -2, \_myRank \} à tous les joueurs pour leur signaler qu'il va envoyer une suggestion.\\
+					Puis leur envoi l'array suggestion[3] = \{ suggestion suspect, suggestion arme, suggestion lieu\}.\\
+					Ce message ne demande pas de réponse.
+			\item Ensuite le joueur doit chercher un autre joueur qui puisse désapprouver cette suggestion.\\
+					Il va donc envoyer à un joueur l'array typeMessage[2] = \{ -1, \_myRank \}.\\
+					Le joueur actif attend alors la réponse de ce joueur, celui-ci ayant déjà reçu la suggestion, il peut directement calculer sa réponse et la renvoyer, via un array reply = \{ -6 ou le numéro de la carte qui désapprouve\}.
+			\item Le joueur courant peut aussi faire une accusation. Sur le même principe que pour les suggestions, il envoi l'array typeMessage[2] = \{ -5, \_myRank\} au gameMaster.\\
+				Celui-ci a déjà reçu l'accusation et calcule donc directement la réponse qu'il renvoi avec l'array reply = \{ 0 (accusation correcte) ou -1 (accusation incorrecte)\}.
+			\item En cas d'accusation correcte, le gameMaster envoie ensuite l'array typeMessage[2] = \{ -4, 0 (Une IA gagne) ou 1 (l'humain gagne)\} pour signaler que le jeu s’arrête. Cela ne demande donc pas non plus de réponse.\\
+			\textit{Rem : Le deuxième paramètre n'est la que pour afficher un message de fin de partie personnalisé}
+			\item Le dernier type de communication a lieu quand un joueur a fini, il envoie alors l'array typeMessage[2] = \{ -3, \_myRank\} au joueur suivant.\\
+			La encore ce message ne demande pas de réponse.		
+		\end{itemize}
+		Rem : Nous utilisons aussi des broadcast pour l'initialisation du système dans la classe Cleudo, pour envoyer le nombre de joueur voulu par l'utilisateur ainsi que le type d'IA voulu.\\
+		Nous n'utilisons plus de broadcast par la suite pour envoyer les suggestion/accusation, car tous les processus n'étant pas à l'écoute (on ne lance que le nombre de processus(// IA) voulu par l'utilisateur) cela aurait nécessité la création d'un communicator dédié, ce qui nous semblait assez lourd pour un gain assez négligeable.
 		
 	(\hyperlink{seqDiag}{Voir diagramme de séquence en annexe} )
 	
@@ -223,26 +201,16 @@ while(_isGameNotFinished)
 
 	\subsection{Statistiques}
 		En faisant jouer les IAs 250 parties entre-elles, on obtient ces statistiques, sur le nombre de tours nécessaires aux IAs pour trouver la bonne solution :
-		
-		\paragraph*{Default AI}\begin{center}
-			\begin{tabular}{|c|c|c|c|c|} \hline
-		  									 &	 	 2 IA 		 &  3 IA 	 	 &   4 IA 	 	&   5 IA 	\\ \hline
-				Nombre moyen de tours		 & 	 	7.27		& 	8.79		& 	9.61	 	& 	9.40\\ \hline
-				Écart-type					&		2.29	 	& 	2.93	 	& 	3.09	 	& 	3.26\\ \hline
+		\begin{center}
+			\begin{tabular}{|c|c|c|c|c|c|} \hline
+		  				&								 &	 	 2 IA 		 &  3 IA 	 	 &   4 IA 	 	&   5 IA 	\\ \hline
+			Nombre moyen de tours &	Default AI		 & 	 	7.27		& 	8.79		& 	9.61	 	& 	9.40\\ \hline
+			&	Listening AI 		 & 	 	8.60		& 	8.63		& 	9.12	 	& 	9.40\\ \hline
+			 &	Mix AI		 & 	 	7.95		& 	9.95		& 	9.70	 	& 	10.23\\ \hline \hline
+			Écart-type &	Default AI				&		2.29	 	& 	2.93	 	& 	3.09	 	& 	3.26\\ \hline 
+			 &	Listening AI 					&		2.12	 	& 	2.80	 	& 	3.26	 	& 	3.32\\ \hline
+				& Mix AI					&		2.27	 	& 	2.96	 	& 	3.41	 	& 	3.18\\ \hline
 			\end{tabular} \end{center}
-		\paragraph*{Listening AI}\begin{center}
-			\begin{tabular}{|c|c|c|c|c|} \hline
-		  									 &	 	 2 IA 		 &  3 IA 	 	 &   4 IA 	 	&   5 IA 	\\ \hline
-				Nombre moyen de tours		 & 	 	8.60		& 	8.63		& 	9.12	 	& 	9.40\\ \hline
-				Écart-type					&		2.12	 	& 	2.80	 	& 	3.26	 	& 	3.32\\ \hline
-			\end{tabular} \end{center}
-		\paragraph*{Mix IA}\begin{center}
-			\begin{tabular}{|c|c|c|c|c|} \hline
-		  									 &	 	 2 IA 		 &  3 IA 	 	 &   4 IA 	 	&   5 IA 	\\ \hline
-				Nombre moyen de tours		 & 	 	7.95		& 	9.95		& 	9.70	 	& 	10.23\\ \hline
-				Écart-type					&		2.27	 	& 	2.96	 	& 	3.41	 	& 	3.18\\ \hline
-			\end{tabular} \end{center}
-		
 
 
 
@@ -297,13 +265,54 @@ while(_isGameNotFinished)
 			%\label{image-label}
 	  	\end{figure}	 
 	 
-	 \subsection{Output des programmes}
-		\begin{figure}[H] \hspace*{-2cm} 
-    	\centering
-   		  \includegraphics[width=350pt]{output.png} 
-			%\caption{titre}
-			%\label{image-label}
-	  	\end{figure}
+
+
+ \subsection{Implémentation de GameMaster} 	\hypertarget{GameMasterImplementation}{}
+
+		\fontfamily{pcr}
+		\begin{lstlisting}
+while(_isGameNotFinished)
+{
+	if(_isHumanTurn)
+	{
+		// On demande a l'utilisateur s'il veut faire une suggestion ou 
+		// une accusation
+		// Puis on la recupere dans un array : int suggestion[3]
+		if(suggestionType == 1) {
+			HumanMakeSuggestion(suggestion);
+		}
+		else {
+			HumanMakeAccusation(suggestion);
+		}
+		_isHumanTurn = false;
+		int messageType[2] = { -3, 0 };
+		MPI_Send(&messageType, 2, MPI_INT, 1, 0, MPI_COMM_WORLD);
+	} 
+	else {
+		int typeMessage[2];
+		MPI_Recv(&typeMessage, 2, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		if(typeMessage[0] == -1){
+			int reply = disaproveASuggestion();
+			MPI_Send(&reply, 1, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD);
+		}
+		else if(typeMessage[0] == -2){
+			MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);		
+		}
+		else if(typeMessage[0] == -3){
+			_isHumanTurn = true;
+		}
+		else if(typeMessage[0] == -5){
+			int accusation[3];
+			MPI_Recv(&accusation, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			MJcheckAccusation(accusation, typeMessage[1]);
+}	}	}
+\end{lstlisting}
+\fontfamily{}	
+	
+
+
+
+
 	 
 	 \subsection{Implémentation de AI} 	\hypertarget{AIimplementation}{}
 	 
@@ -351,7 +360,13 @@ while(_isGameNotFinished)
 \fontfamily{}
 	  
 
-
+	 \subsection{Output des programmes}
+		\begin{figure}[H] \hspace*{-2cm} 
+    	\centering
+   		  \includegraphics[width=350pt]{output.png} 
+			%\caption{titre}
+			%\label{image-label}
+	  	\end{figure}
 
 
 

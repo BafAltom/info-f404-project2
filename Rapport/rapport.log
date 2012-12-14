@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.2.17)  14 DEC 2012 02:12
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.2.17)  15 DEC 2012 00:50
 entering extended mode
  %&-line parsing enabled.
 **rapport.tex
@@ -532,109 +532,97 @@ Overfull \hbox (15.00047pt too wide) in paragraph at lines 107--109
 ecte, emp^echera
  []
 
-[2]
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 116.
+[2] [3] [4]
+Underfull \hbox (badness 10000) in paragraph at lines 188--197
 
- (/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 188--197
+
+ []
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 205.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 205.
+
+Underfull \hbox (badness 10000) in paragraph at lines 226--235
+
+ []
+
+
+Overfull \hbox (3.08289pt too wide) in paragraph at lines 226--235
+\OT1/cmr/m/n/10 sur la bonne r^^Seponse per-met aux de-fault AI de com-penser l
+'^^Sechange d'information
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 226--235
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 226--235
+
+ []
+
+[5] [6] <Diag-Classe.jpeg, id=111, 981.6675pt x 556.0775pt>
+File: Diag-Classe.jpeg Graphic file (type jpg)
+
+<use Diag-Classe.jpeg>
+Overfull \hbox (100.31671pt too wide) in paragraph at lines 253--258
+ []|  [] 
+ []
+
+<Diag-Sequence.jpeg, id=112, 545.03625pt x 635.37375pt>
+File: Diag-Sequence.jpeg Graphic file (type jpg)
+
+<use Diag-Sequence.jpeg> [7 <./Diag-Classe.jpeg>]
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 273.
+
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 LaTeX Font Info:    Font shape `OT1/pcr/bx/n' in size <8> not available
-(Font)              Font shape `OT1/pcr/b/n' tried instead on input line 117.
-LaTeX Font Info:    Try loading font information for OMS+pcr on input line 118.
+(Font)              Font shape `OT1/pcr/b/n' tried instead on input line 274.
+LaTeX Font Info:    Try loading font information for OMS+pcr on input line 275.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omspcr.fd
 File: omspcr.fd 
 )
 LaTeX Font Info:    Font shape `OMS/pcr/m/n' in size <8> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 118.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 275.
 LaTeX Font Info:    Font shape `OT1/pcr/m/it' in size <8> not available
-(Font)              Font shape `OT1/pcr/m/sl' tried instead on input line 121.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 131.
-LaTeX Font Info:    Try loading font information for OMS+ on input line 160.
-LaTeX Font Info:    No file OMS.fd. on input line 160.
-
-
-LaTeX Font Warning: Font shape `OMS//m/n' undefined
-(Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbullet' on input line 160.
-
-[3]
-Underfull \hbox (badness 10000) in paragraph at lines 210--219
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 210--219
-
- []
-
-[4]
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 228.
-
-Underfull \hbox (badness 10000) in paragraph at lines 258--267
-
- []
-
-
-Overfull \hbox (3.08289pt too wide) in paragraph at lines 258--267
-\OT1/cmr/m/n/10 sur la bonne r^^Seponse per-met aux de-fault AI de com-penser l
-'^^Sechange d'information
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 258--267
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 258--267
-
- []
-
-[5] [6] <Diag-Classe.jpeg, id=148, 981.6675pt x 556.0775pt>
-File: Diag-Classe.jpeg Graphic file (type jpg)
-
-<use Diag-Classe.jpeg>
-Overfull \hbox (100.31671pt too wide) in paragraph at lines 285--290
- []|  [] 
- []
-
-<Diag-Sequence.jpeg, id=149, 545.03625pt x 635.37375pt>
-File: Diag-Sequence.jpeg Graphic file (type jpg)
-
-<use Diag-Sequence.jpeg> [7 <./Diag-Classe.jpeg>]
-<output.png, id=155, 779.91376pt x 685.56125pt>
+(Font)              Font shape `OT1/pcr/m/sl' tried instead on input line 278.
+ [8 <./Diag-Sequence.jpeg>] [9] <output.png, id=202, 779.91376pt x 685.56125pt>
 File: output.png Graphic file (type png)
- <use output.png> [8 <./Diag-Sequence.jpeg>] [9 <./output.png>] [10] (./rapport
-.aux)
-
-LaTeX Font Warning: Some font shapes were not available, defaults substituted.
-
- ) 
+ <use output.png> [10 <./output.png>] (./rapport.aux) ) 
 Here is how much of TeX's memory you used:
- 6623 strings out of 495061
- 92383 string characters out of 1182621
- 336522 words of memory out of 3000000
- 9595 multiletter control sequences out of 15000+50000
- 9542 words of font info for 34 fonts, out of 3000000 for 9000
+ 6620 strings out of 495061
+ 92399 string characters out of 1182621
+ 422522 words of memory out of 3000000
+ 9594 multiletter control sequences out of 15000+50000
+ 9888 words of font info for 35 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 38i,7n,58p,308b,1785s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-texlive/fonts/ty
-pe1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts/type1/public/
-amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/
-cmr12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr17.pfb></
-usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/tex
-mf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/
-fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/
-urw/courier/ucrb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/courier/ucrr8a
-.pfb></usr/share/texmf-texlive/fonts/type1/urw/courier/ucrro8a.pfb>
-Output written on rapport.pdf (10 pages, 394606 bytes).
+ 38i,7n,58p,363b,1886s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf-texliv
+e/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texlive/fonts/type1/public/amsf
+onts/cm/cmbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmb
+x12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></us
+r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texm
+f-texlive/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fo
+nts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texmf-texlive/fonts/type1/pub
+lic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfont
+s/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmti10.
+pfb></usr/share/texmf-texlive/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/te
+xmf-texlive/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-texlive/fonts/
+type1/urw/courier/ucrro8a.pfb>
+Output written on rapport.pdf (10 pages, 411856 bytes).
 PDF statistics:
- 267 PDF objects out of 1000 (max. 8388607)
- 106 named destinations out of 1000 (max. 500000)
- 144 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 274 PDF objects out of 1000 (max. 8388607)
+ 105 named destinations out of 1000 (max. 500000)
+ 152 words of extra memory for PDF output out of 10000 (max. 10000000)
 

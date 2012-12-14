@@ -93,7 +93,7 @@ void AI::startGame()
 					cout<<"AI "<<_myRank<<" is sad to lose against a vulgar human"<<endl;
 				}
 				else {
-					cout<<"AI "<<_myRank<<" is proud to have beaten human"<<endl;
+					cout<<"AI "<<_myRank<<" is proud that an AI beat a human"<<endl;
 				}
 				_isGameNotFinished = false;
 			}	

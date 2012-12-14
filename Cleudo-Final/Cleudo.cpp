@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 	int myRank;	
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 	
-	MPI_Barrier(MPI_COMM_WORLD);
+	//MPI_Barrier(MPI_COMM_WORLD);
 	
 	int numberPlayer=0;
     if(myRank ==0){	
