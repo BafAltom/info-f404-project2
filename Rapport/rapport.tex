@@ -1,0 +1,358 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{verbatim}
+\definecolor{grey}{rgb}{0.9,0.9,0.9}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+%\pagestyle{fancy} % voir si laisse ce style ou pas ?
+\lstset{
+language=C++,
+basicstyle=\footnotesize\fontfamily{pcr},
+backgroundcolor=\color{grey},
+numbers=left,
+numberstyle=\tiny,
+numbersep=5pt,
+showstringspaces=false,
+tabsize=2,
+breaklines=true
+}
+
+
+% Title Page
+\title{INFO-F404 Operating Systems II - Projet 2}
+\author{Chapeaux Thomas\\Dagnely Pierre}
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+%%	Intro
+%%
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+	Le but de ce projet était de construire en C++ et MPI une version interactive et multi-processor du jeux cluedo.\\
+	En permettant à l'utilisateur de jouer contre plusieurs IA.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+%%	Implémentation
+%%
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Choix d'implémentation}
+
+	\subsection{Agencement du programme}
+		Notre programme se compose de trois classes :
+		\begin{description}
+			\item[Cleudo :] C'est la classe principale qui contient le main, elle demande à l'utilisateur combien d'IAs il veut, puis initialise le jeux (et l’environnement MPI) en conséquence.\\
+							Elle va créer une classe GameMaster et autant de classe AIs que le joueur désire.
+			\item[GameMaster :] C'est la classe qui va gérer le jeux et le joueur humain.\\
+							Elle s'occupe de toutes les interactions (input/output) avec celui-ci ainsi qu'entre les IAs et lui.\\
+							C'est également elle qui va initialiser la partie (distribution des cartes, sauvegarde de la solution, ...)\\
+							Ainsi que vérifier les accusations et terminer la partie quand l'une d'entre elle se révèle correcte.
+			\item[AI :]	C'est la classe qui va gérer une IA.\\
+							Elle contient les méthodes utilisées par les IAs pour faire des suggestions et accusations, répondre à des suggestions, ...
+		\end{description}
+		
+		(\hyperlink{classDiag}{Voir diagramme de classe en annexe} )
+	
+	\subsection{Structures de données}
+			Nous n'utilisons que des std::vector d'entiers, il sont de deux types :
+			\begin{description}
+				\item[\_humanDeck et \_aiDeck :] Ils représentent les cartes que le joueur humain ou les IAs ont reçut au début du jeu.\\
+						Les cartes sont représentées par des entiers compris entre 0 et 20. Cela permet de simplifier les comparaisons et manipulations.
+				\item[\_aiKnowledge :] ils sont utilisés par les IAs pour représenter leur connaissance du jeu.\\
+						Chaque élément correspond à une carte (ce qui est simplifié par le fait que les cartes sont stockées sous forme d'entier) et la valeur de chaque élément correspond à ce que l'IA sait de cette carte, cette valeur peut être :
+						\begin{itemize}
+							\item -1 : Cela signifie que l'IA sait que cette carte ne peut faire partie de la solution (car dans son jeux ou désapprouvée par un autre joueur).
+							\item Fonction du type d'IA :
+								\begin{itemize}
+									\item default AI : si l'IA ne sait rien d'une carte, sa valeur est mise à 0.
+									\item listening AI : si l'IA ne sait rien d'une carte, sa valeur est le nombre de fois que cette carte est apparue dans une suggestion ou accusation depuis le début de la partie.
+								\end{itemize}
+						\end{itemize}
+			\end{description}
+	
+	\subsection{Implémentation de GameMaster}
+		Le gameMaster sera toujours le processus de rang 0, et sera donc toujours celui qui commencera (c-à-d que l'utilisateur commence toujours)\\
+		\\
+		Le corps du programme se compose d'une boucle tournant jusqu'à ce que quelqu'un trouve la solution ou que l'utilisateur fasse une mauvaise accusation.
+		Le code dans cette boucle se décompose en deux parties :
+		\begin{itemize}
+			\item C'est le tour de l'utilisateur, le gameMaster lui demande alors de faire une suggestion ou une accusation.
+				\begin{itemize}
+					\item S'il fait une suggestion : On appelle une méthode qui "broadcastera" la suggestion à toutes les IAs.\\
+						 Puis qui verra successivement avec chacune d'entre-elles si elle peut la désapprouver (et s'arrêtera dés qu'il y aura une désapprobation)
+					\item S'il fait une accusation : On appelle une méthode qui vérifiera si la suggestion est correcte ou pas.
+							C'est directement vérifié par le gameMaster, sans communications entre processus (Quelque soit la réponse, la partie s'arrête après et le gameMaster stoppe les autres IAs)
+				\end{itemize}
+				Une fois que l'utilisateur à fini son tour, on préviens l'IA suivante (qui sera toujours celle de rang 1).
+			\item C'est le tour d'une des IAs, le gameMaster (et l'utilisateur) attendent un message, qui peut être de plusieurs types :
+				\begin{itemize}
+					\item type = -1 : On demande à l'utilisateur de répondre à une suggestion.\\
+								Il renvoi soit le numéro de la carte qui désapprouve cette suggestion, soit -6 s'il ne peut la désapprouver.
+					\item type = -2 : Une des IAs fait une suggestion ou une accusation.\\
+								On se contente d'afficher cette suggestion pour l'utilisateur, mais il ne faut rien y répondre.
+					\item type = -3 : Les IAs ont finies leurs tours, c'est à nouveau au tour de l'utilisateur.
+					\item type = -5 : On demande au gameMaster de répondre à une accusation.\\
+								Le gameMaster terminera la partie si l'accusation est correcte, empêchera l'IA de jouer à nouveau sinon.
+				\end{itemize}
+		\end{itemize}
+	
+				
+		
+		
+		\fontfamily{pcr}
+		\begin{lstlisting}
+while(_isGameNotFinished)
+{
+	if(_isHumanTurn)
+	{
+		// On demande a l'utilisateur s'il veut faire une suggestion ou 
+		// une accusation
+		// Puis on la recupere dans un array : int suggestion[3]
+		if(suggestionType == 1) {
+			HumanMakeSuggestion(suggestion);
+		}
+		else {
+			HumanMakeAccusation(suggestion);
+		}
+		_isHumanTurn = false;
+		int messageType[2] = { -3, 0 };
+		MPI_Send(&messageType, 2, MPI_INT, 1, 0, MPI_COMM_WORLD);
+	} 
+	else {
+		int typeMessage[2];
+		MPI_Recv(&typeMessage, 2, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		if(typeMessage[0] == -1){
+			int reply = disaproveASuggestion();
+			MPI_Send(&reply, 1, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD);
+		}
+		else if(typeMessage[0] == -2){
+			MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);		
+		}
+		else if(typeMessage[0] == -3){
+			_isHumanTurn = true;
+		}
+		else if(typeMessage[0] == -5){
+			int accusation[3];
+			MPI_Recv(&accusation, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			MJcheckAccusation(accusation, typeMessage[1]);
+}	}	}
+\end{lstlisting}
+\fontfamily{}	
+	
+	
+	\subsection{Implémentation de AI}
+	L'IA a un fonctionnement assez semblable à celui du gameMaster.\\
+	On retrouve aussi la boucle principale avec les parties actives et passives (attente de messages):
+		\begin{itemize}
+			\item C'est le tour de l'IA, si l'IA n'a pas fait d'accusation erronée, elle peut alors jouer (sinon elle passe la main à sa voisine immédiatement).\\
+				L'IA regarde alors combien de cartes "inconnues" il lui reste. Si elle n'en a que trois, elle fait une accusation, sinon elle fait une suggestion.
+				\begin{itemize}
+					\item Si elle fait une suggestion : elle calcule une suggestion selon le type d'IA qu'elle est.\\
+						Elle appelle ensuite une méthode qui "broadcastera" la suggestion à tous les joueurs.\\
+						 Puis qui verra successivement avec chacun d'entre-eux s'il peut la désapprouver (et s'arrêtera des qu'il y aura une désapprobation)
+					\item Si elle fait une accusation : Elle appelle une méthode qui "broadcastera" l'accusation à tous les joueurs.\\
+						 Puis elle verra avec le gameMaster si son accusation est correcte ou pas. Définissant si la partie s'arrête ou si l'IA ne peut plus jouer.
+				\end{itemize}
+				Une fois qu'elle a fini son tour, elle préviens l'IA suivante.
+			\item C'est le tour d'un des autre joueurs, elle attend un message, qui peut être de plusieurs types :
+				\begin{itemize}
+					\item type = -1 : On demande à l'IA de répondre à une suggestion.\\
+								elle renvoi soit le numéro de la carte qui désapprouve cette suggestion, soit -6 si elle ne peut la désapprouver.
+					\item type = -2 : Un des joueurs fait une suggestion ou une accusation.\\
+								Si l'IA est de type listening, elle stocke cette information, sinon elle ne fait rien.
+					\item type = -3 : Les autres joueurs ont finis leurs tours, c'est à nouveau au tour de l'IA.
+					\item type = -4 : Le gameMaster indique que la partie est finie.
+				\end{itemize}
+		\end{itemize}
+	(\hyperlink{AIimplementation}{Voir l'implémentation de AI en annexe} )
+	
+	
+	
+	\subsection{Communications entre processus}
+		En permanence on a un processus actifs tandis que les autres processus attendent un message.\\
+		Ce message est un array d'entier de taille deux, de la forme : message[2] = {"type du message", "rang de l'envoyeur"}\\
+		Lorsqu'il reçoit ce message un processus en attente utilise l'entier représentant le "type du message" pour savoir comment réagir et dans qu'elles méthodes aller.\\
+		Les différents processus alternent alors les sends et les receives, en fonction de ce qui leur est demandé.
+		
+	(\hyperlink{seqDiag}{Voir diagramme de séquence en annexe} )
+	
+		
+		
+		
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+%%	Types d'IA
+%%
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Types d'IAs}
+
+
+	\subsection{Implémentation}
+		L'utilisateur a, au démarrage, le choix entre trois types d'IA :
+		\begin{description}
+			\item[Default AI :] Une IA choisissant les suggestions aléatoirement.
+			
+			\item[Listening AI :] Cette IA prend en considération les suggestions faites par les autres utilisateurs pour faire les siennes.\\
+					Chaque fois qu'une suggestion est faite, elle incrémente les valeurs des éléments du vecteur \_AiKnowledge correspondants aux trois cartes de la suggestion.\\
+					Elle sait donc précisément combien de fois chaque carte a été essayée.\\
+					~\\
+					Or on sait que pour chaque suggestion une des carte a été désapprouvée. Chaque carte a donc une probabilité d'un tiers de ne pas faire partie de la solution.\\
+					Les cartes les plus souvent "jouées" ont donc une plus grand probabilité de ne pas faire partie de la solution.\\
+					~\\
+					L'IA va donc prioritairement choisir les cartes les moins "jouées".\\
+					En pratique elle prendra pour faire ces suggestions les cartes dont la valeur correspondante dans le vecteur \_AiKnowledge est le plus faible (ou s'il y a égalité, choisira aléatoirement une de ces cartes).
+			\item[Mix AI :] Les IA de rang paires utilisent default AI, les autres utilisent listening AI.
+		\end{description}
+
+
+
+	\subsection{Statistiques}
+		En faisant jouer les IAs 250 parties entre-elles, on obtient ces statistiques, sur le nombre de tours nécessaires aux IAs pour trouver la bonne solution :
+		
+		\paragraph*{Default AI}\begin{center}
+			\begin{tabular}{|c|c|c|c|c|} \hline
+		  									 &	 	 2 IA 		 &  3 IA 	 	 &   4 IA 	 	&   5 IA 	\\ \hline
+				Nombre moyen de tours		 & 	 	7.27		& 	8.79		& 	9.61	 	& 	9.40\\ \hline
+				Écart-type					&		2.29	 	& 	2.93	 	& 	3.09	 	& 	3.26\\ \hline
+			\end{tabular} \end{center}
+		\paragraph*{Listening AI}\begin{center}
+			\begin{tabular}{|c|c|c|c|c|} \hline
+		  									 &	 	 2 IA 		 &  3 IA 	 	 &   4 IA 	 	&   5 IA 	\\ \hline
+				Nombre moyen de tours		 & 	 	8.60		& 	8.63		& 	9.12	 	& 	9.40\\ \hline
+				Écart-type					&		2.12	 	& 	2.80	 	& 	3.26	 	& 	3.32\\ \hline
+			\end{tabular} \end{center}
+		\paragraph*{Mix IA}\begin{center}
+			\begin{tabular}{|c|c|c|c|c|} \hline
+		  									 &	 	 2 IA 		 &  3 IA 	 	 &   4 IA 	 	&   5 IA 	\\ \hline
+				Nombre moyen de tours		 & 	 	7.95		& 	9.95		& 	9.70	 	& 	10.23\\ \hline
+				Écart-type					&		2.27	 	& 	2.96	 	& 	3.41	 	& 	3.18\\ \hline
+			\end{tabular} \end{center}
+		
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+%%	Résultat
+%%
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Résultats}
+
+ 	On peut voir que le joueur humain a intérêt à jouer contre des listening AI s'il n'y en a que deux, celle-ci étant les moins efficaces.\\
+ 	Mais contre un nombre moyen d'IAs, les listening AI sont plus efficace que les autres et donc plus dures à battre.
+ 	Elles profitent de l'augmentation du nombre de suggestions pour affiner leurs prédictions.\\
+ 	~\\
+ 	Par contre on peut noter que pour 5 IAs, les listening AI et default AI se valent. Le nombre d'IA fait que la probabilité qu'une d'entre-elles tombe aléatoirement sur la bonne réponse permet aux default AI de compenser l'échange d'information qui a lieu entre les listening AI.\\
+ 	~\\
+ 	Les Mix AI, s'avèrent quant-à-elle les moins efficaces, et offriront le challenge le plus faible.\\
+ 	~\\
+ 	Enfin, on voit qu'aucune différence significative ne se fait jour au niveau des écarts-types.
+ 	
+ 	
+ 	
+ 	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+%%	Appendice
+%%
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\section{Appendice}
+	
+	
+	  	
+	 \subsection{Diagramme de classe}\hypertarget{classDiag}{}
+		\begin{figure}[H] \hspace*{-2cm} 
+    	\centering
+   		  \includegraphics[width=500pt]{Diag-Classe.jpeg} 
+			%\caption{titre}
+			%\label{image-label}
+	  	\end{figure}
+	 
+	\subsection{Diagramme de Séquence}\hypertarget{seqDiag}{}
+		\begin{figure}[H] \hspace*{-2cm} 
+    	\centering
+   		  \includegraphics[width=300pt]{Diag-Sequence.jpeg} 
+			%\caption{titre}
+			%\label{image-label}
+	  	\end{figure}	 
+	 
+	 \subsection{Output des programmes}
+		\begin{figure}[H] \hspace*{-2cm} 
+    	\centering
+   		  \includegraphics[width=350pt]{output.png} 
+			%\caption{titre}
+			%\label{image-label}
+	  	\end{figure}
+	 
+	 \subsection{Implémentation de AI} 	\hypertarget{AIimplementation}{}
+	 
+\fontfamily{pcr}
+\begin{lstlisting}
+while(_isGameNotFinished)
+{
+	if(_isAITurn){
+		if(_IACanPlay){
+			// We compute the number of card unknow for each type.
+			
+			if(suspectsRemaining == 1 and weaponsRemaining == 1 and roomsRemaining ==1){
+				IAMakeAnAccusation();
+			}
+			else{
+				// otherwise, the IA dont know the answer and make a suggestion
+				IAMakeASuggestion(suspectsRemaining, weaponsRemaining, roomsRemaining);
+			}
+		}
+	}
+	else {
+		int typeMessage[2];
+		MPI_Recv(&typeMessage, 2, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			
+		if(typeMessage[0] == -1){
+			int reply = disproveASuggestion();
+			MPI_Send(&reply, 1, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD);
+		}
+		else if(typeMessage[0] == -2) // One of the players brodcast a suggestion or accusation
+		{	
+			MPI_Recv(&_currentSuggestion, 3, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			if(_typeOfIA == 1){
+					// The IA save this information if it's a listening IA (they use it to compute suggestions)
+			}
+		}
+		else if(typeMessage[0] == -3){
+			_isAITurn = true;
+		}
+		else if(typeMessage[0] == -4){
+			_isGameNotFinished = false;	
+}	}	}
+
+
+\end{lstlisting}
+\fontfamily{}
+	  
+
+
+
+
+
+\end{document}          

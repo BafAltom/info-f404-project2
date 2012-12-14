@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}
+\BOOKMARK [1][-]{section.2}{Choix d'impl\351mentation}{}
+\BOOKMARK [2][-]{subsection.2.1}{Agencement du programme}{section.2}
+\BOOKMARK [2][-]{subsection.2.2}{Structures de donn\351es}{section.2}
+\BOOKMARK [2][-]{subsection.2.3}{Impl\351mentation de GameMaster}{section.2}
+\BOOKMARK [2][-]{subsection.2.4}{Impl\351mentation de AI}{section.2}
+\BOOKMARK [2][-]{subsection.2.5}{Communications entre processus}{section.2}
+\BOOKMARK [1][-]{section.3}{Types d'IAs}{}
+\BOOKMARK [2][-]{subsection.3.1}{Impl\351mentation}{section.3}
+\BOOKMARK [2][-]{subsection.3.2}{Statistiques}{section.3}
+\BOOKMARK [1][-]{section.4}{R\351sultats}{}
+\BOOKMARK [1][-]{section.5}{Appendice}{}
+\BOOKMARK [2][-]{subsection.5.1}{Diagramme de classe}{section.5}
+\BOOKMARK [2][-]{subsection.5.2}{Diagramme de S\351quence}{section.5}
+\BOOKMARK [2][-]{subsection.5.3}{Output des programmes}{section.5}
+\BOOKMARK [2][-]{subsection.5.4}{Impl\351mentation de AI}{section.5}

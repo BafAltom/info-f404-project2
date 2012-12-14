@@ -1,4 +1,4 @@
-#include "gameMaster.hpp"
+#include "GameMaster.hpp"
 
 /**
 * \details	The main function of the game master, which initialize and run the game
@@ -66,27 +66,27 @@ void GameMaster::startGame()
 			{
 				HumanMakeAccusation(suggestion);
 			}
-			// The player finish his turn, it's the turn of the IA with rank 1.
+			// The player finish his turn, it's the turn of the AI with rank 1.
 			_isHumanTurn = false;
 			int messageType[2] = { -3, 0 };
 			MPI_Send(&messageType, 2, MPI_INT, 1, 0, MPI_COMM_WORLD);
 			
 		}
-		else // It's the turn of the IA's, so the GM (and human player) wait for a message of one of the IA's
+		else // It's the turn of the AI's, so the GM (and human player) wait for a message of one of the AI's
 		{
 			int typeMessage[2];
 			MPI_Recv(&typeMessage, 2, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			if(typeMessage[0] == -1) // the human player has to answer to a suggestion of one of the IA's
+			if(typeMessage[0] == -1) // the human player has to answer to a suggestion of one of the AI's
 			{
 				int reply = disaproveASuggestion();
 				MPI_Send(&reply, 1, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD);
 			}
-			else if(typeMessage[0] == -2)// One of the IA's brodcast a suggestion or accusation
+			else if(typeMessage[0] == -2)// One of the AI's brodcast a suggestion or accusation
 			{
 				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-				cout<<"IA "<<typeMessage[1]<<" make a suggestion or accusation for "<<valueOfCard(_currentSuggestion[0])<<" ("<<_currentSuggestion[0]<<") , "<<valueOfCard(_currentSuggestion[1])<<" ("<<_currentSuggestion[1]<<") , "<<valueOfCard(_currentSuggestion[2])<<" ("<<_currentSuggestion[2]<<")"<<endl;
+				cout<<"AI "<<typeMessage[1]<<" make a suggestion or accusation for "<<valueOfCard(_currentSuggestion[0])<<" ("<<_currentSuggestion[0]<<") , "<<valueOfCard(_currentSuggestion[1])<<" ("<<_currentSuggestion[1]<<") , "<<valueOfCard(_currentSuggestion[2])<<" ("<<_currentSuggestion[2]<<")"<<endl;
 			}
-			else if(typeMessage[0] == -3) // The IA's finished their turns, so it's the turn of the human player
+			else if(typeMessage[0] == -3) // The AI's finished their turns, so it's the turn of the human player
 			{
 				_isHumanTurn = true;
 			}
@@ -94,7 +94,7 @@ void GameMaster::startGame()
 			{
 				int accusation[3];
 				MPI_Recv(&accusation, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-				MJcheckAccusation(accusation, typeMessage[1]);
+				GMCheckAccusation(accusation, typeMessage[1]);
 			}	
 		}	
 	}
@@ -102,16 +102,16 @@ void GameMaster::startGame()
 /**
 * \details	The GM check if the accusation is correct and manages the game consequently.
 */
-void GameMaster::MJcheckAccusation(int accusation[3], int sender)
+void GameMaster::GMCheckAccusation(int accusation[3], int sender)
 {
 	if(isAccusationTrue(accusation)){
-		//the accusation is correct, the IA win and the game stop.
-		cout<<"IA "<<sender<<" make a correct accusation and win the game"<<endl;
+		//the accusation is correct, the AI win and the game stop.
+		cout<<"AI "<<sender<<" make a correct accusation and win the game"<<endl;
 		cout<<"the solution was :"<<valueOfCard(accusation[0])<<" ("<<accusation[0]<<") "<<valueOfCard(accusation[1])<<" ("<<accusation[1]<<") "<<valueOfCard(accusation[2])<<" ("<<accusation[2]<<")"<<endl;
 		int reply = 0;
 		MPI_Send(&reply, 1, MPI_INT, sender, 0, MPI_COMM_WORLD);
 		
-		// We say an all the IA's that the game is over.
+		// We say an all the AI's that the game is over.
 		int messageType[2] = { -4, 0 };
 		for(int i =1; i< _numberPlayer; ++i)
 		{
@@ -120,8 +120,8 @@ void GameMaster::MJcheckAccusation(int accusation[3], int sender)
 		_isGameNotFinished=false;
 	}
 	else{
-		// the accusation is wrong, the GM says to the IA that they cannot play again.
-		cout<<"IA "<<sender<<" make a wrong accusation and cannot play again"<<endl;
+		// the accusation is wrong, the GM says to the AI that they cannot play again.
+		cout<<"AI "<<sender<<" make a wrong accusation and cannot play again"<<endl;
 		int reply = -1;
 		MPI_Send(&reply, 1, MPI_INT, sender, 0, MPI_COMM_WORLD);
 	}
@@ -131,7 +131,7 @@ void GameMaster::MJcheckAccusation(int accusation[3], int sender)
 */
 void GameMaster::HumanMakeSuggestion(int suggestion[3])
 {
-	// First the GM broadcast the suggestion to all IA's
+	// First the GM broadcast the suggestion to all AI's
 	int messageType[2] = { -2, 0 };
 	for(int i =1; i< _numberPlayer; ++i)
 	{
@@ -139,7 +139,7 @@ void GameMaster::HumanMakeSuggestion(int suggestion[3])
 		MPI_Send(suggestion, 3, MPI_INT, i, 0, MPI_COMM_WORLD);
 	}
 	
-	// After that, the GM see with all IA one by one if they can disapprove this suggestion (and stop if a IA can)
+	// After that, the GM see with all AI one by one if they can disapprove this suggestion (and stop if a AI can)
 	int playerAsking = 1;
 	while (playerAsking !=-1)
 	{
@@ -148,7 +148,7 @@ void GameMaster::HumanMakeSuggestion(int suggestion[3])
 					
 		int reply;
 		MPI_Recv(&reply, 1, MPI_INT, playerAsking, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		// if reply == -6, this IA can't disapprove this suggestion, we trie with the following
+		// if reply == -6, this AI can't disapprove this suggestion, we trie with the following
 		if(reply ==-6){
 			playerAsking ++;
 			if(playerAsking >= _numberPlayer){
@@ -156,8 +156,8 @@ void GameMaster::HumanMakeSuggestion(int suggestion[3])
 				cout<<"Nobody can refute your suggestion"<<endl;
 			}
 		}
-		else{ // otherwise an IA disaprove the suggestion, the human player has finished his turn.
-			cout<<"IA "<<playerAsking<<" refute your suggestion for the card "<<valueOfCard(reply)<<" ("<<reply<<")"<<endl;	
+		else{ // otherwise an AI disaprove the suggestion, the human player has finished his turn.
+			cout<<"AI "<<playerAsking<<" refute your suggestion for the card "<<valueOfCard(reply)<<" ("<<reply<<")"<<endl;	
 			playerAsking = -1;
 		}
 	}
@@ -179,14 +179,14 @@ void GameMaster::HumanMakeAccusation(int accusation[3])
 		cout<<"the solution was :"<<valueOfCard(_guilty)<<" ("<<_guilty<<") "<<valueOfCard(_crimeWeapon)<<" ("<<_crimeWeapon<<") "<<valueOfCard(_crimeRoom)<<" ("<<_crimeRoom<<") "<<endl;
 	}
 	_isGameNotFinished=false;
-	// the Gm says to all IA's that the game stops.
+	// the Gm says to all AI's that the game stops.
 	for(int i =1; i< _numberPlayer; ++i){
 		MPI_Send(&messageType, 2, MPI_INT, i, 0, MPI_COMM_WORLD);
 	}
 }
 
 /**
-* \details	this function is used by the Gm and the human player to answer when an IA ask for a suggestion
+* \details	this function is used by the Gm and the human player to answer when an AI ask for a suggestion
 * \return 	-6 if the human player can't disaproved this suggestion, the number of the card disaproved otherwise
 */
 int GameMaster::disaproveASuggestion()
@@ -295,8 +295,8 @@ void GameMaster::distributeCard()
 		}
 		player = (player+1) % _numberPlayer ;
 	}
-	// when we distributed all cards, we says to the IA that all card are distributed.
-	// we should do this, because the number of card distributed change with the number of IA, and so it's simpler with a terminal sign
+	// when we distributed all cards, we says to the AI that all card are distributed.
+	// we should do this, because the number of card distributed change with the number of AI, and so it's simpler with a terminal sign
 	int stop =-1;
 	for(int i =1; i< _numberPlayer; ++i)
 	{

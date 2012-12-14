@@ -17,15 +17,19 @@ public:
     ~GameMaster() {}
     
     void run(int numberPlayer);
-    
-    
+ 
     
 private:
 	
 	void distributeCard();
 	void startGame();
-	bool isAccusationTrue(int suggestion[3]);
-	string valueOfCard(int reply);
+	int disaproveASuggestion();
+	void HumanMakeSuggestion(int suggestion[3]);
+	void HumanMakeAccusation(int accusation[3]);
+	void GMCheckAccusation(int accusation[3], int sender);
+	
+	bool isAccusationTrue(int accusation[3]);
+	string valueOfCard(int card);
 
 
 	int _numberPlayer;
