@@ -1,8 +1,0 @@
-Pour lancer le programme, écrire dans le terminal :
-
-module load openmpi/1.4.3/gcc/4.6.1 (seulement la première fois)
-mpiCC gameMaster.cpp IA.cpp Cleudo.cpp
-mpirun -np 6 ./a.out
-
-
-Surtout ne pas utiliser de jobfile, car cela bloque les cout/cin et envoie tous les résultats dans un fichier
