@@ -55,7 +55,7 @@ breaklines=true
 		Notre programme se compose de trois classes :
 		\begin{description}
 			\item[Cleudo :] C'est la classe principale qui contient le main, elle demande à l'utilisateur combien d'IAs il veut, puis initialise le jeux (et l’environnement MPI) en conséquence.\\
-							Elle va créer une classe GameMaster et autant de classe AIs que le joueur désire.
+							Elle va créer une instance GameMaster et autant d'instances AIs que le joueur désire.
 			\item[GameMaster :] C'est la classe qui va gérer le jeux et le joueur humain.\\
 							Elle s'occupe de toutes les interactions (input/output) avec celui-ci ainsi qu'entre les IAs et lui.\\
 							C'est également elle qui va initialiser la partie (distribution des cartes, sauvegarde de la solution, ...)\\
@@ -129,12 +129,16 @@ breaklines=true
 				\end{itemize}
 				Une fois qu'elle a fini son tour, elle préviens l'IA suivante.
 			\item C'est le tour d'un des autre joueurs, elle attend un message, qui peut être de plusieurs types :
+%				\begin{itemize}
+%					\item type = -1 : On demande à l'IA de répondre à une suggestion.\\
+%								elle renvoi soit le numéro de la carte qui désapprouve cette suggestion, soit -6 si elle ne peut la désapprouver.
+%					\item type = -2 : Un des joueurs fait une suggestion ou une accusation.\\
+%								Si l'IA est de type listening, elle stocke cette information, sinon elle ne fait rien.
+%					\item type = -3 : Les autres joueurs ont finis leurs tours, c'est à nouveau au tour de l'IA.
+%					\item type = -4 : Le gameMaster indique que la partie est finie.
+%				\end{itemize}
 				\begin{itemize}
-					\item type = -1 : On demande à l'IA de répondre à une suggestion.\\
-								elle renvoi soit le numéro de la carte qui désapprouve cette suggestion, soit -6 si elle ne peut la désapprouver.
-					\item type = -2 : Un des joueurs fait une suggestion ou une accusation.\\
-								Si l'IA est de type listening, elle stocke cette information, sinon elle ne fait rien.
-					\item type = -3 : Les autres joueurs ont finis leurs tours, c'est à nouveau au tour de l'IA.
+					\item type = -1 ou -2 ou -3: L'IA réagit comme doit le faire l'utilisateur.
 					\item type = -4 : Le gameMaster indique que la partie est finie.
 				\end{itemize}
 		\end{itemize}
@@ -343,7 +347,7 @@ while(_isGameNotFinished)
 		}
 		else if(typeMessage[0] == -2) // One of the players brodcast a suggestion or accusation
 		{	
-			MPI_Recv(&_currentSuggestion, 3, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			if(_typeOfIA == 1){
 					// The IA save this information if it's a listening IA (they use it to compute suggestions)
 			}

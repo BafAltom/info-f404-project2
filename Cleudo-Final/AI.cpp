@@ -69,7 +69,7 @@ void AI::startGame()
 			}
 			else if(typeMessage[0] == -2) // One of the players brodcast a suggestion or accusation
 			{	
-				MPI_Recv(&_currentSuggestion, 3, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 				if(_typeOfAI == 1){
 					// The AI save this information if it's a listening AI (they use it to compute suggestions)
 					if(_AiKnowledge.at(_currentSuggestion[0]) != -1){
