@@ -67,7 +67,7 @@ void AI::startGame()
 				int reply = disaproveASuggestion();
 				MPI_Send(&reply, 1, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD);
 			}
-			else if(typeMessage[0] == -2) // One of the players brodcast a suggestion or accusation
+			else if(typeMessage[0] == -2) // One of the players brodcast a suggestion
 			{	
 				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 				if(_typeOfAI == 1){
@@ -96,6 +96,22 @@ void AI::startGame()
 					cout<<"AI "<<_myRank<<" is proud that an AI beat a human"<<endl;
 				}
 				_isGameNotFinished = false;
+			}
+			else // typeMessage[0] == -6 => One of the players brodcast an accusation 
+			{	
+				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				if(_typeOfAI == 1){
+					// The AI save this information if it's a listening AI (they use it to compute suggestions)
+					if(_AiKnowledge.at(_currentSuggestion[0]) != -1){
+						_AiKnowledge.at(_currentSuggestion[0]) = _AiKnowledge.at(_currentSuggestion[0]) +1;
+					}
+					if(_AiKnowledge.at(_currentSuggestion[1]) != -1){
+						_AiKnowledge.at(_currentSuggestion[1]) = _AiKnowledge.at(_currentSuggestion[1]) +1;
+					}
+					if(_AiKnowledge.at(_currentSuggestion[2]) != -1){
+						_AiKnowledge.at(_currentSuggestion[2]) = _AiKnowledge.at(_currentSuggestion[2]) +1;
+					}
+				}
 			}	
 		}
 	}
@@ -144,8 +160,8 @@ void AI::AIMakeSuggestion(int suspectsRemaining, int weaponsRemaining, int rooms
 					
 		int reply;
 		MPI_Recv(&reply, 1, MPI_INT, playerAsking, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		// if reply == -6, this player can't disapprove this suggestion, we trie with the following
-		if(reply ==-6){
+		// if reply == -1, this player can't disapprove this suggestion, we trie with the following
+		if(reply ==-1){
 			playerAsking = (playerAsking +1) % _numberPlayer;
 			if(playerAsking == _myRank){
 				playerAsking = -1;
@@ -187,7 +203,7 @@ void AI::AIMakeAccusation()
 	}
 	
 	// First the AI broadcast the suggestion to all players
-	int messageType[2] = { -2, _myRank };
+	int messageType[2] = { -6, _myRank };
 	for(int i =0; i< _numberPlayer; ++i)
 	{
 		if (i != _myRank){
@@ -287,11 +303,11 @@ int AI::getNumberCardsUnknow(int inf, int sup)
 }
 /**
 * \details	this function is used by the AI for see if she can disapprove a suggestion.
-* \return 	-6 if the AI can't disaproved this suggestion, the number of the card disaproved otherwise
+* \return 	-1 if the AI can't disaproved this suggestion, the number of the card disaproved otherwise
 */
 int AI::disaproveASuggestion()
 {
-	int reply = -6;
+	int reply = -1;
 	vector<int> cardDisaproved;
 	// First we save all card which disaproved this suggestion
 	for(unsigned int i=0; i < _AiDeck.size(); ++i)

@@ -101,8 +101,8 @@ breaklines=true
 				\begin{itemize}
 					\item type = -1 : On demande à l'utilisateur de répondre à une suggestion.\\
 								Il renvoi soit le numéro de la carte qui désapprouve cette suggestion, soit -6 s'il ne peut la désapprouver.
-					\item type = -2 : Une des IAs fait une suggestion ou une accusation.\\
-								On se contente d'afficher cette suggestion pour l'utilisateur, mais il ne faut rien y répondre.
+					\item type = -2 ou -6 : Une des IAs fait une suggestion(-2) ou une accusation(-6).\\
+								On se contente d'afficher cette suggestion/accusation pour l'utilisateur, mais il ne faut rien y répondre.
 					\item type = -3 : Les IAs ont finies leurs tours, c'est à nouveau au tour de l'utilisateur.
 					\item type = -5 : On demande au gameMaster de répondre à une accusation.\\
 								Le gameMaster terminera la partie si l'accusation est correcte, empêchera l'IA de jouer à nouveau sinon.
@@ -125,7 +125,7 @@ breaklines=true
 						Elle appelle ensuite une méthode qui "broadcastera" la suggestion à tous les joueurs.\\
 						 Puis qui verra successivement avec chacun d'entre-eux s'il peut la désapprouver (et s'arrêtera des qu'il y aura une désapprobation)
 					\item Si elle fait une accusation : Elle appelle une méthode qui "broadcastera" l'accusation à tous les joueurs.\\
-						 Puis elle verra avec le gameMaster si son accusation est correcte ou pas. Définissant si la partie s'arrête ou si l'IA ne peut plus jouer.
+						 Puis qui verra avec le gameMaster si son accusation est correcte ou pas. Définissant si la partie s'arrête ou si l'IA ne peut plus jouer.
 				\end{itemize}
 				Une fois qu'elle a fini son tour, elle préviens l'IA suivante.
 			\item C'est le tour d'un des autre joueurs, elle attend un message, qui peut être de plusieurs types :
@@ -138,7 +138,7 @@ breaklines=true
 %					\item type = -4 : Le gameMaster indique que la partie est finie.
 %				\end{itemize}
 				\begin{itemize}
-					\item type = -1 ou -2 ou -3: L'IA réagit comme doit le faire l'utilisateur.
+					\item type = -1 ou -2 ou -3 ou -6: L'IA réagit comme doit le faire l'utilisateur.
 					\item type = -4 : Le gameMaster indique que la partie est finie.
 				\end{itemize}
 		\end{itemize}
@@ -153,12 +153,12 @@ breaklines=true
 		Les différents processus alternent alors les sends et les receives, en fonction de ce qui leur est demandé :
 		\begin{itemize}
 			\item Envoi d'une suggestion (ou d'une accusation) à tous les joueurs.\\
-					Le joueur actif envoi alors l'array typeMessage[2] = \{ -2, \_myRank \} à tous les joueurs pour leur signaler qu'il va envoyer une suggestion.\\
+					Le joueur actif envoi alors l'array typeMessage[2] = \{ -2(suggestion) ou -6(accusation), \_myRank \} à tous les joueurs pour leur signaler qu'il va envoyer une suggestion/accusation.\\
 					Puis leur envoi l'array suggestion[3] = \{ suggestion suspect, suggestion arme, suggestion lieu\}.\\
 					Ce message ne demande pas de réponse.
 			\item Ensuite le joueur doit chercher un autre joueur qui puisse désapprouver cette suggestion.\\
 					Il va donc envoyer à un joueur l'array typeMessage[2] = \{ -1, \_myRank \}.\\
-					Le joueur actif attend alors la réponse de ce joueur, celui-ci ayant déjà reçu la suggestion, il peut directement calculer sa réponse et la renvoyer, via un array reply = \{ -6 ou le numéro de la carte qui désapprouve\}.
+					Le joueur actif attend alors la réponse de ce joueur, celui-ci ayant déjà reçu la suggestion, il peut directement calculer sa réponse et la renvoyer, via un array reply = \{ -1 ou le numéro de la carte qui désapprouve\}.
 			\item Le joueur courant peut aussi faire une accusation. Sur le même principe que pour les suggestions, il envoi l'array typeMessage[2] = \{ -5, \_myRank\} au gameMaster.\\
 				Celui-ci a déjà reçu l'accusation et calcule donc directement la réponse qu'il renvoi avec l'array reply = \{ 0 (accusation correcte) ou -1 (accusation incorrecte)\}.
 			\item En cas d'accusation correcte, le gameMaster envoie ensuite l'array typeMessage[2] = \{ -4, 0 (Une IA gagne) ou 1 (l'humain gagne)\} pour signaler que le jeu s’arrête. Cela ne demande donc pas non plus de réponse.\\
@@ -261,6 +261,7 @@ breaklines=true
 			%\label{image-label}
 	  	\end{figure}
 	 
+	 
 	\subsection{Diagramme de Séquence}\hypertarget{seqDiag}{}
 		\begin{figure}[H] \hspace*{-2cm} 
     	\centering
@@ -309,7 +310,13 @@ while(_isGameNotFinished)
 			int accusation[3];
 			MPI_Recv(&accusation, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			MJcheckAccusation(accusation, typeMessage[1]);
-}	}	}
+		}
+		else // typeMessage[0] == -6
+		{
+			MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		}
+	}	
+}
 \end{lstlisting}
 \fontfamily{}	
 	
@@ -357,8 +364,16 @@ while(_isGameNotFinished)
 		}
 		else if(typeMessage[0] == -4){
 			_isGameNotFinished = false;	
-}	}	}
-
+		}
+		else // typeMessage[0] == -6
+		{	
+			MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			if(_typeOfIA == 1){
+					// The IA save this information if it's a listening IA (they use it to compute suggestions)
+			}
+		}
+	}	
+}
 
 \end{lstlisting}
 \fontfamily{}
@@ -367,7 +382,7 @@ while(_isGameNotFinished)
 	 \subsection{Output des programmes}
 		\begin{figure}[H] \hspace*{-2cm} 
     	\centering
-   		  \includegraphics[width=350pt]{output.png} 
+   		  \includegraphics[width=350pt]{output2.png} 
 			%\caption{titre}
 			%\label{image-label}
 	  	\end{figure}

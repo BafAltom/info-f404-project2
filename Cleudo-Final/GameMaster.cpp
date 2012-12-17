@@ -81,10 +81,10 @@ void GameMaster::startGame()
 				int reply = disaproveASuggestion();
 				MPI_Send(&reply, 1, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD);
 			}
-			else if(typeMessage[0] == -2)// One of the AI's brodcast a suggestion or accusation
+			else if(typeMessage[0] == -2)// One of the AI's brodcast a suggestion
 			{
 				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-				cout<<"AI "<<typeMessage[1]<<" make a suggestion or accusation for "<<valueOfCard(_currentSuggestion[0])<<" ("<<_currentSuggestion[0]<<") , "<<valueOfCard(_currentSuggestion[1])<<" ("<<_currentSuggestion[1]<<") , "<<valueOfCard(_currentSuggestion[2])<<" ("<<_currentSuggestion[2]<<")"<<endl;
+				cout<<"AI "<<typeMessage[1]<<" make a suggestion for "<<valueOfCard(_currentSuggestion[0])<<" ("<<_currentSuggestion[0]<<") , "<<valueOfCard(_currentSuggestion[1])<<" ("<<_currentSuggestion[1]<<") , "<<valueOfCard(_currentSuggestion[2])<<" ("<<_currentSuggestion[2]<<")"<<endl;
 			}
 			else if(typeMessage[0] == -3) // The AI's finished their turns, so it's the turn of the human player
 			{
@@ -95,7 +95,12 @@ void GameMaster::startGame()
 				int accusation[3];
 				MPI_Recv(&accusation, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 				GMCheckAccusation(accusation, typeMessage[1]);
-			}	
+			}
+			else // typeMessage[0] == -6 => One of the AI's brodcast an accusation
+			{
+				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				cout<<"AI "<<typeMessage[1]<<" make an accusation for "<<valueOfCard(_currentSuggestion[0])<<" ("<<_currentSuggestion[0]<<") , "<<valueOfCard(_currentSuggestion[1])<<" ("<<_currentSuggestion[1]<<") , "<<valueOfCard(_currentSuggestion[2])<<" ("<<_currentSuggestion[2]<<")"<<endl;
+			}
 		}	
 	}
 }
@@ -148,8 +153,8 @@ void GameMaster::HumanMakeSuggestion(int suggestion[3])
 					
 		int reply;
 		MPI_Recv(&reply, 1, MPI_INT, playerAsking, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		// if reply == -6, this AI can't disapprove this suggestion, we trie with the following
-		if(reply ==-6){
+		// if reply == -1, this AI can't disapprove this suggestion, we trie with the following
+		if(reply ==-1){
 			playerAsking ++;
 			if(playerAsking >= _numberPlayer){
 				playerAsking = -1;
@@ -187,11 +192,11 @@ void GameMaster::HumanMakeAccusation(int accusation[3])
 
 /**
 * \details	this function is used by the Gm and the human player to answer when an AI ask for a suggestion
-* \return 	-6 if the human player can't disaproved this suggestion, the number of the card disaproved otherwise
+* \return 	-1 if the human player can't disaproved this suggestion, the number of the card disaproved otherwise
 */
 int GameMaster::disaproveASuggestion()
 {
-	int reply = -6;
+	int reply = -1;
 	vector<int> cardDisaproved;
 	// First we save all card which disaproved this suggestion
 	for(unsigned int i=0; i < _humanDeck.size(); ++i)
@@ -214,7 +219,7 @@ int GameMaster::disaproveASuggestion()
 		cout<<"this suggestion is disaproved with one of your card : "<<valueOfCard(cardDisaproved.at(0))<<" ("<<cardDisaproved.at(0)<<") "<<endl;
 		reply = cardDisaproved.at(0);
 	}
-	// If their is no card which disaproved this suggestion, reply is still at -6
+	// If their is no card which disaproved this suggestion, reply is still at -1
 	return reply;
 }
 

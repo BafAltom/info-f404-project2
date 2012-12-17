@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.2.17)  16 DEC 2012 23:50
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.2.17)  17 DEC 2012 11:52
 entering extended mode
  %&-line parsing enabled.
 **rapport.tex
@@ -527,12 +527,30 @@ Overfull \hbox (9.36171pt too wide) in paragraph at lines 87--91
  []
 
 
+Overfull \hbox (8.66716pt too wide) in paragraph at lines 104--106
+[]\OT1/cmr/m/n/10 type = -2 ou -6 : Une des IAs fait une suggestion(-2) ou une 
+accusation(-
+ []
+
+
+Overfull \hbox (5.69499pt too wide) in paragraph at lines 104--106
+\OT1/cmr/m/n/10 On se con-tente d'afficher cette sug-ges-tion/ac-cu-sa-tion pou
+r l'utilisateur,
+ []
+
+
 Overfull \hbox (15.00047pt too wide) in paragraph at lines 107--109
 \OT1/cmr/m/n/10 Le gameMas-ter ter-min-era la par-tie si l'accusation est cor-r
 ecte, emp^echera
  []
 
-[2] [3]
+[2]
+Overfull \hbox (3.94386pt too wide) in paragraph at lines 141--142
+[]\OT1/cmr/m/n/10 type = -1 ou -2 ou -3 ou -6: L'IA r^^Seagit comme doit le fai
+re l'utilisateur. 
+ []
+
+[3]
 Underfull \hbox (badness 10000) in paragraph at lines 192--201
 
  []
@@ -579,50 +597,50 @@ Overfull \hbox (100.31671pt too wide) in paragraph at lines 257--262
 File: Diag-Sequence.jpeg Graphic file (type jpg)
 
 <use Diag-Sequence.jpeg> [6 <./Diag-Classe.jpeg>]
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 277.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 278.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 LaTeX Font Info:    Font shape `OT1/pcr/bx/n' in size <8> not available
-(Font)              Font shape `OT1/pcr/b/n' tried instead on input line 278.
-LaTeX Font Info:    Try loading font information for OMS+pcr on input line 279.
+(Font)              Font shape `OT1/pcr/b/n' tried instead on input line 279.
+LaTeX Font Info:    Try loading font information for OMS+pcr on input line 280.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omspcr.fd
 File: omspcr.fd 
 )
 LaTeX Font Info:    Font shape `OMS/pcr/m/n' in size <8> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 279.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 280.
 LaTeX Font Info:    Font shape `OT1/pcr/m/it' in size <8> not available
-(Font)              Font shape `OT1/pcr/m/sl' tried instead on input line 282.
- [7 <./Diag-Sequence.jpeg>] [8] <output.png, id=198, 779.91376pt x 685.56125pt>
-File: output.png Graphic file (type png)
- <use output.png> [9 <./output.png>] (./rapport.aux) ) 
+(Font)              Font shape `OT1/pcr/m/sl' tried instead on input line 283.
+ [7 <./Diag-Sequence.jpeg>] [8] <output2.png, id=197, 899.36pt x 670.505pt>
+File: output2.png Graphic file (type png)
+ <use output2.png> [9 <./output2.png>] (./rapport.aux) ) 
 Here is how much of TeX's memory you used:
- 6619 strings out of 495061
- 92392 string characters out of 1182621
- 422522 words of memory out of 3000000
+ 6635 strings out of 495061
+ 92628 string characters out of 1182621
+ 413522 words of memory out of 3000000
  9594 multiletter control sequences out of 15000+50000
  9888 words of font info for 35 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  38i,7n,58p,363b,1886s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive
-/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texlive/fonts/type1/public/amsfo
-nts/cm/cmbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx
-12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
-/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf
--texlive/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fon
-ts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texmf-texlive/fonts/type1/publ
-ic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts
-/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmti10.p
-fb></usr/share/texmf-texlive/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/tex
-mf-texlive/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-texlive/fonts/t
-ype1/urw/courier/ucrro8a.pfb>
-Output written on rapport.pdf (9 pages, 410999 bytes).
+{/usr/share/texmf-texli
+ve/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texlive/fonts/type1/public/ams
+fonts/cm/cmbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cm
+bx12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></u
+sr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/tex
+mf-texlive/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/f
+onts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texmf-texlive/fonts/type1/pu
+blic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfon
+ts/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmti10
+.pfb></usr/share/texmf-texlive/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/t
+exmf-texlive/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-texlive/fonts
+/type1/urw/courier/ucrro8a.pfb>
+Output written on rapport.pdf (9 pages, 414908 bytes).
 PDF statistics:
- 270 PDF objects out of 1000 (max. 8388607)
- 104 named destinations out of 1000 (max. 500000)
+ 288 PDF objects out of 1000 (max. 8388607)
+ 119 named destinations out of 1000 (max. 500000)
  152 words of extra memory for PDF output out of 10000 (max. 10000000)
 
