@@ -72,14 +72,9 @@ void AI::startGame()
 				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 				if(_typeOfAI == 1){
 					// The AI save this information if it's a listening AI (they use it to compute suggestions)
-					if(_AiKnowledge.at(_currentSuggestion[0]) != -1){
-						_AiKnowledge.at(_currentSuggestion[0]) = _AiKnowledge.at(_currentSuggestion[0]) +1;
-					}
-					if(_AiKnowledge.at(_currentSuggestion[1]) != -1){
-						_AiKnowledge.at(_currentSuggestion[1]) = _AiKnowledge.at(_currentSuggestion[1]) +1;
-					}
-					if(_AiKnowledge.at(_currentSuggestion[2]) != -1){
-						_AiKnowledge.at(_currentSuggestion[2]) = _AiKnowledge.at(_currentSuggestion[2]) +1;
+					for(int i=0; i<3; ++i){
+						if(_AiKnowledge.at(_currentSuggestion[i]) != -1)
+						_AiKnowledge.at(_currentSuggestion[i]) = _AiKnowledge.at(_currentSuggestion[i]) +1;
 					}
 				}
 			}
@@ -102,14 +97,9 @@ void AI::startGame()
 				MPI_Recv(&_currentSuggestion, 3, MPI_INT, typeMessage[1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 				if(_typeOfAI == 1){
 					// The AI save this information if it's a listening AI (they use it to compute suggestions)
-					if(_AiKnowledge.at(_currentSuggestion[0]) != -1){
-						_AiKnowledge.at(_currentSuggestion[0]) = _AiKnowledge.at(_currentSuggestion[0]) +1;
-					}
-					if(_AiKnowledge.at(_currentSuggestion[1]) != -1){
-						_AiKnowledge.at(_currentSuggestion[1]) = _AiKnowledge.at(_currentSuggestion[1]) +1;
-					}
-					if(_AiKnowledge.at(_currentSuggestion[2]) != -1){
-						_AiKnowledge.at(_currentSuggestion[2]) = _AiKnowledge.at(_currentSuggestion[2]) +1;
+					for(int i=0; i<3; ++i){
+						if(_AiKnowledge.at(_currentSuggestion[i]) != -1)
+						_AiKnowledge.at(_currentSuggestion[i]) = _AiKnowledge.at(_currentSuggestion[i]) +1;
 					}
 				}
 			}	
