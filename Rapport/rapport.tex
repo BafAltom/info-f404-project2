@@ -9,7 +9,9 @@
 \usepackage{float}
 \usepackage{graphicx}
 \usepackage{fancyhdr}
-%\pagestyle{fancy} % voir si laisse ce style ou pas ?
+\pagestyle{fancy} % voir si laisse ce style ou pas ?
+%\usepackage[top=2.5cm,bottom=2.5cm,right=2.5cm,left=2.5cm]{geometry}
+\usepackage[right=4cm,left=4cm]{geometry}
 \lstset{
 language=C++,
 basicstyle=\footnotesize\fontfamily{pcr},
@@ -55,7 +57,8 @@ breaklines=true
 		Notre programme se compose de trois classes :
 		\begin{description}
 			\item[Cleudo :] C'est la classe principale qui contient le main, elle demande à l'utilisateur combien d'IAs il veut, puis initialise le jeux (et l’environnement MPI) en conséquence.\\
-							Elle va créer une instance GameMaster et autant d'instances AIs que le joueur désire.
+							Elle va créer une instance GameMaster et autant d'instances AIs que le joueur désire.\\
+							\textit{Rem : Au lancement du programme nous demandons directement 6 processus, et c'est l'utilisateur qui choisira combien seront vraiment utilisés.}
 			\item[GameMaster :] C'est la classe qui va gérer le jeux et le joueur humain.\\
 							Elle s'occupe de toutes les interactions (input/output) avec celui-ci ainsi qu'entre les IAs et lui.\\
 							C'est également elle qui va initialiser la partie (distribution des cartes, sauvegarde de la solution, ...)\\
